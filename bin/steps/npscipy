@@ -10,7 +10,7 @@
 #
 # This script is invoked by [`bin/compile`](/).
 VENDORED_GIT_NAME="npscipy-binaries"
-VENDORED_GIT_REPO="https://github.com/wyn/$VENDORED_GIT_NAME.git"
+VENDORED_GIT_REPO="https://github.com/kmp1/$VENDORED_GIT_NAME.git"
 # The location of the pre-compiled atlas/lapack/blas/gfortran binaries.
 VENDORED_BINARIES="npscipy"
 
@@ -41,13 +41,12 @@ if (grep -iq -e "numpy" -e "scipy" requirements.txt) then
   export ATLAS=$(pwd)/vendor/lib/atlas-base/libatlas.a
   export LIBRARY_PATH=$(pwd)/vendor/lib:$(pwd)/lib/atlas-base:$(pwd)/lib/atlas-base/atlas
   export LD_LIBRARY_PATH=$(pwd)/vendor/lib:$(pwd)/lib/atlas-base:$(pwd)/lib/atlas-base/atlas
-  
-  for ((i=0;i<${#PACKAGES[@]};i++))
+  for PACKAGE in "${PACKAGES[@]}"
   do
-    PACKAGE=$PACKAGES[$i]
+    echo "------> Looking for package $PACKAGE in ../requirements.txt"
     if (grep -iqe "$PACKAGE" ../requirements.txt) then
       VERSION=`grep -ie "$PACKAGE" ../requirements.txt | awk -F"==" '{print $2}'` 
-      CACHED_VERSION=`source venv/bin/activate; python -c "try: from $PACKAGE import __version__; print __version__;
+      CACHED_VERSION=`python -c "try: from $PACKAGE import __version__; print __version__;
 except: print '0.0.0'"`
       if [ $VERSION = $CACHED_VERSION ]; then
         echo "-----> Using cached version of $PACKAGE-$VERSION"
@@ -68,8 +67,10 @@ except: print '0.0.0'"`
           git checkout HEAD $NAME.tar.gz
         fi
 
+        cd ../python
+        tar xf "../$VENDORED_GIT_NAME/$NAME.tar.gz"
+        echo "-----> Completed Creating/downloading $PACKAGE-$VERSION by unzipping $VENDORED_GIT_NAME/$NAME.tar.gz." 
         cd ..
-        tar xf "$VENDORED_GIT_NAME/$NAME.tar.gz"
       fi
     fi
   done
