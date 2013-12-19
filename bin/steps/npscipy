@@ -43,7 +43,7 @@ if (grep -iq -e "numpy" -e "scipy" requirements.txt) then
   export LD_LIBRARY_PATH=$(pwd)/vendor/lib:$(pwd)/lib/atlas-base:$(pwd)/lib/atlas-base/atlas
   for PACKAGE in "${PACKAGES[@]}"
   do
-    echo "------> Looking for package $PACKAGE in ../requirements.txt"
+    echo "-----> Looking for package $PACKAGE in ../requirements.txt"
     if (grep -iqe "$PACKAGE" ../requirements.txt) then
       VERSION=`grep -ie "$PACKAGE" ../requirements.txt | awk -F"==" '{print $2}'` 
       CACHED_VERSION=`python -c "try: from $PACKAGE import __version__; print __version__;
